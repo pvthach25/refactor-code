@@ -19,18 +19,16 @@ public class PersonalTaskManagerViolations {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // Phương thức trợ giúp để tải dữ liệu (sẽ được gọi lặp lại)
-    private static JSONArray loadTasksFromDb() {
-        JSONParser parser = new JSONParser();
-        try (FileReader reader = new FileReader(DB_FILE_PATH)) {
-            Object obj = parser.parse(reader);
-            if (obj instanceof JSONArray) {
-                return (JSONArray) obj;
-            }
-        } catch (IOException | ParseException e) {
-            System.err.println("Lỗi khi đọc file database: " + e.getMessage());
+    private boolean isDuplicateTask(JSONArray tasks, String title, LocalDate dueDate) {
+    for (Object obj : tasks) {
+        JSONObject task = (JSONObject) obj;
+        if (task.get("title").toString().equalsIgnoreCase(title) &&
+            task.get("due_date").toString().equals(dueDate.format(DATE_FORMATTER))) {
+            return true;
         }
-        return new JSONArray();
     }
+    return false;
+}
 
     // Phương thức trợ giúp để lưu dữ liệu
     private static void saveTasksToDb(JSONArray tasksData) {
