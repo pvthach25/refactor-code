@@ -19,18 +19,16 @@ public class PersonalTaskManagerViolations {
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     // Phương thức trợ giúp để tải dữ liệu (sẽ được gọi lặp lại)
-    private static JSONArray loadTasksFromDb() {
-        JSONParser parser = new JSONParser();
-        try (FileReader reader = new FileReader(DB_FILE_PATH)) {
-            Object obj = parser.parse(reader);
-            if (obj instanceof JSONArray) {
-                return (JSONArray) obj;
-            }
-        } catch (IOException | ParseException e) {
-            System.err.println("Lỗi khi đọc file database: " + e.getMessage());
+    private boolean isDuplicateTask(JSONArray tasks, String title, LocalDate dueDate) {
+    for (Object obj : tasks) {
+        JSONObject task = (JSONObject) obj;
+        if (task.get("title").toString().equalsIgnoreCase(title) &&
+            task.get("due_date").toString().equals(dueDate.format(DATE_FORMATTER))) {
+            return true;
         }
-        return new JSONArray();
     }
+    return false;
+}
 
     // Phương thức trợ giúp để lưu dữ liệu
     private static void saveTasksToDb(JSONArray tasksData) {
@@ -52,72 +50,35 @@ public class PersonalTaskManagerViolations {
      * @param isRecurring Boolean có phải là nhiệm vụ lặp lại không.
      * @return JSONObject của nhiệm vụ đã thêm, hoặc null nếu có lỗi.
      */
-    public JSONObject addNewTaskWithViolations(String title, String description,
-                                                String dueDateStr, String priorityLevel,
-                                                boolean isRecurring) {
+    private JSONObject createTask(String title, String description, LocalDate dueDate,
+                              String priorityLevel, boolean isRecurring) {
 
-        if (title == null || title.trim().isEmpty()) {
-            System.out.println("Lỗi: Tiêu đề không được để trống.");
-            return null;
-        }
-        if (dueDateStr == null || dueDateStr.trim().isEmpty()) {
-            System.out.println("Lỗi: Ngày đến hạn không được để trống.");
-            return null;
-        }
-        LocalDate dueDate;
-        try {
-            dueDate = LocalDate.parse(dueDateStr, DATE_FORMATTER);
-        } catch (DateTimeParseException e) {
-            System.out.println("Lỗi: Ngày đến hạn không hợp lệ. Vui lòng sử dụng định dạng YYYY-MM-DD.");
-            return null;
-        }
-        String[] validPriorities = {"Thấp", "Trung bình", "Cao"};
-        boolean isValidPriority = false;
-        for (String validP : validPriorities) {
-            if (validP.equals(priorityLevel)) {
-                isValidPriority = true;
-                break;
-            }
-        }
-        if (!isValidPriority) {
-            System.out.println("Lỗi: Mức độ ưu tiên không hợp lệ. Vui lòng chọn từ: Thấp, Trung bình, Cao.");
-            return null;
-        }
+    JSONObject task = new JSONObject();
+    JSONObject task = new JSONObject();
+JSONObject task = new JSONObject();
+int newId = tasks.size() + 1; // ← Dùng số lượng task hiện có để tạo ID tăng dần
+task.put("id", newId);        // ← Sửa chỗ này
+task.put("title", title);
+task.put("due_date", dueDate.format(DATE_FORMATTER));
+    if (isRecurring) {
+        task.put("recurrence_pattern", "Chưa xác định");
+    }
+    return task;
+}
 
         // Tải dữ liệu
-        JSONArray tasks = loadTasksFromDb();
+        public class TaskDatabase {
+    private static final String FILE_NAME = "tasks_database.json";
 
-        // Kiểm tra trùng lặp
-        for (Object obj : tasks) {
-            JSONObject existingTask = (JSONObject) obj;
-            if (existingTask.get("title").toString().equalsIgnoreCase(title) &&
-                existingTask.get("due_date").toString().equals(dueDate.format(DATE_FORMATTER))) {
-                System.out.println(String.format("Lỗi: Nhiệm vụ '%s' đã tồn tại với cùng ngày đến hạn.", title));
-                return null;
-            }
-        }
+    public static JSONArray loadTasks() {
+        // giống loadTasksFromDb()
+    }
 
-        String taskId = UUID.randomUUID().toString(); // YAGNI: Có thể dùng số nguyên tăng dần đơn giản hơn.
+    public static void saveTasks(JSONArray tasks) {
+        // giống saveTasksToDb()
+    }
+}
 
-        JSONObject newTask = new JSONObject();
-        newTask.put("id", taskId);
-        newTask.put("title", title);
-        newTask.put("description", description);
-        newTask.put("due_date", dueDate.format(DATE_FORMATTER));
-        newTask.put("priority", priorityLevel);
-        newTask.put("status", "Chưa hoàn thành");
-        newTask.put("created_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        newTask.put("last_updated_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        newTask.put("is_recurring", isRecurring); // YAGNI: Thêm thuộc tính này dù chưa có chức năng xử lý nhiệm vụ lặp lại
-        if (isRecurring) {
-
-            newTask.put("recurrence_pattern", "Chưa xác định");
-        }
-
-        tasks.add(newTask);
-
-        // Lưu dữ liệu
-        saveTasksToDb(tasks);
 
         System.out.println(String.format("Đã thêm nhiệm vụ mới thành công với ID: %s", taskId));
         return newTask;
@@ -162,3 +123,7 @@ public class PersonalTaskManagerViolations {
         );
     }
 }
+private String getCurrentTimestamp() {
+    return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+}
+
