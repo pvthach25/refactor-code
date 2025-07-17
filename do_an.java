@@ -85,39 +85,18 @@ public class PersonalTaskManagerViolations {
         }
 
         // Tải dữ liệu
-        JSONArray tasks = loadTasksFromDb();
+        public class TaskDatabase {
+    private static final String FILE_NAME = "tasks_database.json";
 
-        // Kiểm tra trùng lặp
-        for (Object obj : tasks) {
-            JSONObject existingTask = (JSONObject) obj;
-            if (existingTask.get("title").toString().equalsIgnoreCase(title) &&
-                existingTask.get("due_date").toString().equals(dueDate.format(DATE_FORMATTER))) {
-                System.out.println(String.format("Lỗi: Nhiệm vụ '%s' đã tồn tại với cùng ngày đến hạn.", title));
-                return null;
-            }
-        }
+    public static JSONArray loadTasks() {
+        // giống loadTasksFromDb()
+    }
 
-        String taskId = UUID.randomUUID().toString(); // YAGNI: Có thể dùng số nguyên tăng dần đơn giản hơn.
+    public static void saveTasks(JSONArray tasks) {
+        // giống saveTasksToDb()
+    }
+}
 
-        JSONObject newTask = new JSONObject();
-        newTask.put("id", taskId);
-        newTask.put("title", title);
-        newTask.put("description", description);
-        newTask.put("due_date", dueDate.format(DATE_FORMATTER));
-        newTask.put("priority", priorityLevel);
-        newTask.put("status", "Chưa hoàn thành");
-        newTask.put("created_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        newTask.put("last_updated_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-        newTask.put("is_recurring", isRecurring); // YAGNI: Thêm thuộc tính này dù chưa có chức năng xử lý nhiệm vụ lặp lại
-        if (isRecurring) {
-
-            newTask.put("recurrence_pattern", "Chưa xác định");
-        }
-
-        tasks.add(newTask);
-
-        // Lưu dữ liệu
-        saveTasksToDb(tasks);
 
         System.out.println(String.format("Đã thêm nhiệm vụ mới thành công với ID: %s", taskId));
         return newTask;
