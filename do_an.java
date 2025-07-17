@@ -50,37 +50,24 @@ public class PersonalTaskManagerViolations {
      * @param isRecurring Boolean có phải là nhiệm vụ lặp lại không.
      * @return JSONObject của nhiệm vụ đã thêm, hoặc null nếu có lỗi.
      */
-    public JSONObject addNewTaskWithViolations(String title, String description,
-                                                String dueDateStr, String priorityLevel,
-                                                boolean isRecurring) {
+    private JSONObject createTask(String title, String description, LocalDate dueDate,
+                              String priorityLevel, boolean isRecurring) {
 
-        if (title == null || title.trim().isEmpty()) {
-            System.out.println("Lỗi: Tiêu đề không được để trống.");
-            return null;
-        }
-        if (dueDateStr == null || dueDateStr.trim().isEmpty()) {
-            System.out.println("Lỗi: Ngày đến hạn không được để trống.");
-            return null;
-        }
-        LocalDate dueDate;
-        try {
-            dueDate = LocalDate.parse(dueDateStr, DATE_FORMATTER);
-        } catch (DateTimeParseException e) {
-            System.out.println("Lỗi: Ngày đến hạn không hợp lệ. Vui lòng sử dụng định dạng YYYY-MM-DD.");
-            return null;
-        }
-        String[] validPriorities = {"Thấp", "Trung bình", "Cao"};
-        boolean isValidPriority = false;
-        for (String validP : validPriorities) {
-            if (validP.equals(priorityLevel)) {
-                isValidPriority = true;
-                break;
-            }
-        }
-        if (!isValidPriority) {
-            System.out.println("Lỗi: Mức độ ưu tiên không hợp lệ. Vui lòng chọn từ: Thấp, Trung bình, Cao.");
-            return null;
-        }
+    JSONObject task = new JSONObject();
+    task.put("id", UUID.randomUUID().toString()); // Có thể thay bằng ID đơn giản hơn
+    task.put("title", title);
+    task.put("description", description);
+    task.put("due_date", dueDate.format(DATE_FORMATTER));
+    task.put("priority", priorityLevel);
+    task.put("status", "Chưa hoàn thành");
+    task.put("created_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+    task.put("last_updated_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
+    task.put("is_recurring", isRecurring); // Vi phạm YAGNI nếu chưa xử lý tính năng này
+    if (isRecurring) {
+        task.put("recurrence_pattern", "Chưa xác định");
+    }
+    return task;
+}
 
         // Tải dữ liệu
         public class TaskDatabase {
