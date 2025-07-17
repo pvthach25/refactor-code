@@ -54,15 +54,10 @@ public class PersonalTaskManagerViolations {
                               String priorityLevel, boolean isRecurring) {
 
     JSONObject task = new JSONObject();
-    task.put("id", UUID.randomUUID().toString()); // Có thể thay bằng ID đơn giản hơn
-    task.put("title", title);
-    task.put("description", description);
-    task.put("due_date", dueDate.format(DATE_FORMATTER));
-    task.put("priority", priorityLevel);
-    task.put("status", "Chưa hoàn thành");
-    task.put("created_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-    task.put("last_updated_at", LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME));
-    task.put("is_recurring", isRecurring); // Vi phạm YAGNI nếu chưa xử lý tính năng này
+    JSONObject task = new JSONObject();
+task.put("id", tasks.size() + 1);
+task.put("title", title);
+task.put("due_date", dueDate.format(DATE_FORMATTER));
     if (isRecurring) {
         task.put("recurrence_pattern", "Chưa xác định");
     }
