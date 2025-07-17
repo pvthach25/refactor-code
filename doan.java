@@ -71,13 +71,11 @@ public class PersonalTaskManagerViolations {
             System.out.println("Lỗi: Ngày đến hạn không hợp lệ. Vui lòng sử dụng định dạng YYYY-MM-DD.");
             return null;
         }
-        String[] validPriorities = {"Thấp", "Trung bình", "Cao"};
-        boolean isValidPriority = false;
-        for (String validP : validPriorities) {
-            if (validP.equals(priorityLevel)) {
-                isValidPriority = true;
-                break;
-            }
+        List<String> validPriorities = List.of("Thấp", "Trung bình", "Cao");
+        if (!validPriorities.contains(priorityLevel)) {
+            System.out.println("Mức độ ưu tiên không hợp lệ.");
+            return;
+        }
         }
         if (!isValidPriority) {
             System.out.println("Lỗi: Mức độ ưu tiên không hợp lệ. Vui lòng chọn từ: Thấp, Trung bình, Cao.");
