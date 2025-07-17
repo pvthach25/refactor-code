@@ -126,3 +126,6 @@ public class PersonalTaskManagerViolations {
         );
     }
 }
+private String getCurrentTimestamp() {
+    return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+}
