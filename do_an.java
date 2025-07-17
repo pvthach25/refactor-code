@@ -55,7 +55,9 @@ public class PersonalTaskManagerViolations {
 
     JSONObject task = new JSONObject();
     JSONObject task = new JSONObject();
-task.put("id", tasks.size() + 1);
+JSONObject task = new JSONObject();
+int newId = tasks.size() + 1; // ← Dùng số lượng task hiện có để tạo ID tăng dần
+task.put("id", newId);        // ← Sửa chỗ này
 task.put("title", title);
 task.put("due_date", dueDate.format(DATE_FORMATTER));
     if (isRecurring) {
@@ -124,3 +126,4 @@ task.put("due_date", dueDate.format(DATE_FORMATTER));
 private String getCurrentTimestamp() {
     return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 }
+
